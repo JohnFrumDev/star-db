@@ -46,6 +46,17 @@ export default class DummySwapiService {
         crew: 1000,
         passengers: 50,
         cargoCapacity: 100
+      },
+      {
+        id: 2,
+        name: 'SS [TEST DATA]',
+        model: 'NCC-1702-C',
+        manufacturer: 'Boeing',
+        costInCredits: 'not known',
+        length: 'approx 300 meters',
+        crew: 2000,
+        passengers: 80,
+        cargoCapacity: 200
       }
     ];
   
