@@ -2,37 +2,65 @@ import React, { Component } from 'react';
 
 import Header from '../header';
 import RandomPlanet from '../random-planet';
-import ItemList from '../item-list';
-import PersonDetails from '../person-details';
+import ErrorBoundry from '../error-boundry';
+
+import DummySwapiService from '../../services/dummy-swapi-service';
+import SwapiService from "../../services/swapi-service";
+import {SwapiServiceProvider} from '../swapi-service-context';
+import {PeoplePage, PlanetsPage, StarshipsPage} from '../pages';
 
 import './app.css';
 
 export default class App extends Component {
 
   state = {
-    selectedPerson: 5
+    showRandomPlanet: true,
+    swapiService: new SwapiService()
   };
 
-  onPersonSelected = (id) => {
-    this.setState( {
-      selectedPerson: id
-    })
+  toggleRandomPlanet = () => {
+    this.setState((state) => {
+      return {
+        showRandomPlanet: !state.showRandomPlanet
+      }
+    });
+  };
+
+  onServiceChange = () => {
+    this.setState(({swapiService}) => {
+      const Service = swapiService instanceof SwapiService ?
+                      DummySwapiService : SwapiService;
+      console.log('Service changed to ' + Service.name);
+
+      return {
+        swapiService: new Service()
+      };
+    });
   }
 
   render() {
+
+    const planet = this.state.showRandomPlanet ?
+      <RandomPlanet updateInterval={2000}/> :
+      null;
+
     return (
-      <div>
-        <Header />
-        <RandomPlanet />
-        <div className="row mb2">
-          <div className="col-md-6">
-            <ItemList onItemSelected={this.onPersonSelected}/>
+      <ErrorBoundry>
+        <SwapiServiceProvider value={this.state.swapiService}>
+          <div className="stardb-app">
+            <Header onServiceChange={this.onServiceChange}/>
+
+            { planet }
+
+            <PeoplePage/>
+
+            <PlanetsPage/>
+            
+            <StarshipsPage/>
+
           </div>
-          <div className="col-md-6">
-            <PersonDetails personId={this.state.selectedPerson}/>
-          </div>
-        </div>
-      </div>
-    )
-  };
-};
+        </SwapiServiceProvider>
+      </ErrorBoundry>
+    );
+  }
+}
